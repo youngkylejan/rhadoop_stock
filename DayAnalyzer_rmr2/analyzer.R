@@ -18,10 +18,15 @@ data = to.dfs(data$val)
 
 data.mr = mapreduce(
   input = data,
-  map = mapper,
-  reduce = reducer,
+  map = format_mapper,
+  reduce = format_reducer,
   combine = TRUE,
   output = "/ML_DAY_STOCKS"
 )
 
-y = from.dfs(data.mr)
+formattedData = from.dfs(data.mr)
+formattedData$date = as.Date(formattedData$date)
+formattedData$stock = as.character(formattedData$stock)
+
+
+

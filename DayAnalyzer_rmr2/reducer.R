@@ -7,6 +7,6 @@ Sys.setenv("RHIVE_FS_HOME" = "/home/hadoop/rhive")
 library(rhdfs)
 library(rmr2)
 
-reducer <- function(k, v) {
+format_reducer <- function(k, v) {
   keyval(k, v[v$stock == k,])
 }
