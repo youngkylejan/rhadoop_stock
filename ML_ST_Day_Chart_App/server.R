@@ -9,19 +9,21 @@ library(rmr2)
 library(shiny)
 library(datasets)
 library(ggplot2)
+library(quantmod)
 
 hdfs.init()
+
+chartData = from.dfs("/ML_OHLC_CLUSTER")
 
 # Define server logic required to summarize and view the selected dataset
 shinyServer(function(input, output) {
   
   # Return the chart dataset
   chartXTS <- reactive({
-    chartData = from.dfs(paste("/ML_Day_Chart/", input$stockID, sep = ""),
-                         format = make.input.format("csv", sep = ","))$val
-    names(chartData) = c("date", "stock", "open", "high", "low", "close")
-    chartData$date = as.Date(chartData$date)
-    xts(chartData[, 3:6], order.by = chartData$date)
+    seriesData = chartData$val[chartData$key == input$stockID,]
+    names(seriesData) = c("date", "stock", "open", "high", "low", "close")
+    seriesData$date = as.Date(seriesData$date)
+    xts(seriesData[, 3:6], order.by = seriesData$date)
   })
   
   # Return the returns dataset
