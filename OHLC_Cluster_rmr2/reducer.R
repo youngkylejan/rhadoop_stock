@@ -8,5 +8,9 @@ library(xts)
 library(quantmod)
 
 cluster_reducer <- function(k, v) {
-  keyval(k, v[v$stock == k,])
+  correspond_v = v[v$stock == k,]
+  v$date = as.character(v$date)
+  new_v = as.data.frame(cbind(v$date, v$open, v$high, v$low, v$close), stringsAsFactors = FALSE)
+  names(new_v) = c("date", "open", "high", "low", "close")
+  keyval(k, new_v)
 }

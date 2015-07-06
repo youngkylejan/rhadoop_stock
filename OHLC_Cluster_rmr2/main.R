@@ -10,9 +10,13 @@ source('~/Documents/Cherry/OHLC_Cluster_rmr2/reducer.R')
 
 hdfs.init()
 
+# options(stringsAsFactors = TRUE)
+
 data = from.dfs('/ML_DAY', format = make.input.format("csv", sep = ","))
-names(data$val) = c("date", "stock", "open", "high", "low", "close")
-data = to.dfs(data$val)
+data = data$val
+data = as.data.frame(data, stringsAsFactors = FALSE)
+names(data) = c("date", "stock", "open", "high", "low", "close")
+data = to.dfs(data)
 
 data.mr = mapreduce(
   input = data,
