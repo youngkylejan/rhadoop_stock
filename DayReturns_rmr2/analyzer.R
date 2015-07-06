@@ -10,23 +10,17 @@ library(rmr2)
 source('~/Documents/Cherry/DayAnalyzer_rmr2/mapper.R')
 source('~/Documents/Cherry/DayAnalyzer_rmr2/reducer.R')
 
+hdfs.init()
+
 data = from.dfs('/ML_DAY', format = make.input.format("csv", sep = ","))
 names(data$val) = c("date", "stock", "open", "high", "low", "close")
-data$date = as.character(data$date)
-data$stock = as.character(data$stock)
 data = to.dfs(data$val)
 
 data.mr = mapreduce(
   input = data,
-  map = format_mapper,
-  reduce = format_reducer,
+  map = returns_mapper,
+  reduce = returns_reducer,
   combine = TRUE,
-  output = "/ML_DAY_STOCKS"
+  output = "/ML_RMR2_RETURNS"
 )
-
-formattedData = from.dfs(data.mr)
-formattedData$date = as.Date(formattedData$date)
-formattedData$stock = as.character(formattedData$stock)
-
-
 

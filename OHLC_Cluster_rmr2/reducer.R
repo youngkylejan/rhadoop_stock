@@ -4,7 +4,9 @@ Sys.setenv("HADOOP_STREAMING" = "/usr/local/hadoop/share/hadoop/tools/lib/hadoop
 
 library(rhdfs)
 library(rmr2)
+library(xts)
+library(quantmod)
 
-format_mapper <- function(k, v) {
-  keyval(v$stock, v)
+cluster_reducer <- function(k, v) {
+  keyval(k, v[v$stock == k,])
 }
