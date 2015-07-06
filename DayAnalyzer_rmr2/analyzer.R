@@ -7,18 +7,21 @@ Sys.setenv("RHIVE_FS_HOME" = "/home/hadoop/rhive")
 library(rhdfs)
 library(rmr2)
 
-source('~/Documents/Cherry/DayChangeFreq_rmr2/mapper.R')
-source('~/Documents/Cherry/DayChangeFreq_rmr2/reducer.R')
+source('~/Documents/Cherry/DayAnalyzer_rmr2/mapper.R')
+source('~/Documents/Cherry/DayAnalyzer_rmr2/reducer.R')
 
 data = from.dfs('/ML_DAY', format = make.input.format("csv", sep = ","))
 names(data$val) = c("date", "stock", "open", "high", "low", "close")
+data$date = as.character(data$date)
+data$stock = as.character(data$stock)
 data = to.dfs(data$val)
 
 data.mr = mapreduce(
   input = data,
   map = mapper,
   reduce = reducer,
-  combine = TRUE
+  combine = TRUE,
+  output = "/ML_DAY_STOCKS"
 )
 
 y = from.dfs(data.mr)
