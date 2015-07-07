@@ -5,6 +5,6 @@ Sys.setenv("HADOOP_STREAMING" = "/usr/local/hadoop/share/hadoop/tools/lib/hadoop
 library(rhdfs)
 library(rmr2)
 
-cluster_mapper <- function(k, v) {
-  keyval(v$stock, v)
+returns_mapper <- function(k, v) {
+  keyval(v$stock, v$ohlcData)
 }

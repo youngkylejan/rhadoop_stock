@@ -8,9 +8,16 @@ library(xts)
 library(quantmod)
 
 returns_reducer <- function(k, v) {
-  ohlc = v[as.character(v$stock) == as.character(k),]
-  ohlc$date = as.Date(ohlc$date)
-  ohlcXTS = xts(ohlc[, 3:6], order.by = ohlc$date)
+  v = as.character(v)
+  df = as.data.frame(do.call(rbind, strsplit(v, ",")))
+  names(df) = c("date", "open", "high", "low", "close")
+  df$date = as.Date(as.character(df$date))
+  df$open = as.numeric(df$open)
+  df$high = as.numeric(df$high)
+  df$low = as.numeric(df$low)
+  df$close = as.numeric(df$close)
+  
+  ohlcXTS = xts(df[, 2:5], order.by = df$date)
   returns = allReturns(ohlcXTS)
   returns = data.frame(date = index(returns), coredata(returns))
   keyval(k, returns)
