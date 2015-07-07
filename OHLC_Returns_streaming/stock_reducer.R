@@ -34,7 +34,7 @@ for (i in 1:length(lines)) {
       returns = allReturns(ohlcXTS)
       returns = data.frame(date = index(returns), coredata(returns))
       output = cbind(current.key, returns)
-      names(output) = c("stock", "daily", "weekly", "monthly", "quarterly", "yearly")
+      names(output) = c("stock", "date", "daily", "weekly", "monthly", "quarterly", "yearly")
       write.csv(output, stdout())
       
       current.key = key
@@ -57,7 +57,7 @@ ohlcXTS = xts(df[, 2:5], order.by = df$date)
 returns = allReturns(ohlcXTS)
 returns = data.frame(date = index(returns), coredata(returns))
 output = cbind(current.key, returns)
-names(output) = c("stock", "daily", "weekly", "monthly", "quarterly", "yearly")
+names(output) = c("stock", "date", "daily", "weekly", "monthly", "quarterly", "yearly")
 write.csv(output, stdout())
 
 close(conn)

@@ -14,6 +14,10 @@ hdfs.init()
 chartData = from.dfs("/ML_OHLC_STREAMING", format = make.input.format("csv", sep = "\t"))$val
 names(chartData) = c("stock", "ohlc")
 
+returns = from.dfs("/ML_OHLC_RETURNS", format = make.input.format("csv", sep = ","))$val
+returns = returns[, 2:8]
+names(returns) = c("stock", "date", "daily", "weekly", "monthly", "quarterly", "yearly")
+
 # Define server logic required to summarize and view the selected dataset
 shinyServer(function(input, output) {
   
@@ -37,11 +41,16 @@ shinyServer(function(input, output) {
   
   # Return the returns dataset
   returnsData <- reactive({
-    returns = from.dfs(paste("/ML_RETURNS/", input$stockID, sep = ""),
-                           format = make.input.format("csv", sep = ","))$val
-    names(returns) = c("date", "daily", "weekly", "monthly", "quarterly", "yearly")
-    returns$date = as.Date(returns$date)
-    specificReturn = returns[, c("date", input$returnType)]
+    df = returns[returns$stock == input$stockID,]
+    
+    df$date = as.Date(as.character(df$date))
+    df$daily = as.numeric(as.character(df$daily))
+    df$weekly = as.numeric(as.character(df$weekly))
+    df$monthly = as.numeric(as.character(df$monthly))
+    df$quarterly = as.numeric(as.character(df$quarterly))
+    df$yearly = as.numeric(as.character(df$yearly))
+    
+    specificReturn = df[, c("date", input$returnType)]
     names(specificReturn) = c("date", "returns")
     specificReturn
   })  
