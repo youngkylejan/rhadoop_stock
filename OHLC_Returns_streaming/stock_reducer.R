@@ -1,5 +1,7 @@
 #!/usr/bin/Rscript
 
+library(quantmod)
+
 current.key <- NA
 current.val <- NA
 
@@ -11,26 +13,51 @@ for (i in 1:length(lines)) {
   fields <- unlist(strsplit(lines[i], "\t"))
   
   key = as.character(fields[1])
-  date = as.character(fields[2])
-  open = as.double(fields[3])
-  high = as.double(fields[4])
-  low = as.double(fields[5])
-  close = as.double(fields[6])
-  val = paste(date, open, high, low, close, sep = ",")
+  val = as.character(fields[2])
   
   if (is.na(current.key)) {
     current.key = key
     current.val = val
   } else {
-    if (current.key == key) {
-      current.val = paste(current.val, val, sep = "|")
-    } else {
-      write(paste(current.key, current.val, sep = "\t"), stdout())
+    if (current.key != key) {
+      tmp = unlist(strsplit(current.val, "\\|"))
+      df = as.data.frame(do.call(rbind, strsplit(tmp, ",")))
+      
+      names(df) = c("date", "open", "high", "low", "close")
+      df$date = as.Date(as.character(df$date))
+      df$open = as.numeric(df$open)
+      df$high = as.numeric(df$high)
+      df$low = as.numeric(df$low)
+      df$close = as.numeric(df$close)
+      
+      ohlcXTS = xts(df[, 2:5], order.by = df$date)
+      returns = allReturns(ohlcXTS)
+      returns = data.frame(date = index(returns), coredata(returns))
+      output = cbind(current.key, returns)
+      names(output) = c("stock", "daily", "weekly", "monthly", "quarterly", "yearly")
+      write.csv(output, stdout())
+      
       current.key = key
       current.val = val
     }
   }
 }
 
-write(paste(current.key, current.val, sep = "\t"), stdout())
+tmp = unlist(strsplit(current.val, "\\|"))
+df = as.data.frame(do.call(rbind, strsplit(tmp, ",")))
+
+names(df) = c("date", "open", "high", "low", "close")
+df$date = as.Date(as.character(df$date))
+df$open = as.numeric(df$open)
+df$high = as.numeric(df$high)
+df$low = as.numeric(df$low)
+df$close = as.numeric(df$close)
+
+ohlcXTS = xts(df[, 2:5], order.by = df$date)
+returns = allReturns(ohlcXTS)
+returns = data.frame(date = index(returns), coredata(returns))
+output = cbind(current.key, returns)
+names(output) = c("stock", "daily", "weekly", "monthly", "quarterly", "yearly")
+write.csv(output, stdout())
+
 close(conn)
