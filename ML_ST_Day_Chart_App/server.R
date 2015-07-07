@@ -1,8 +1,6 @@
 Sys.setenv("HADOOP_CMD" = "/usr/local/hadoop/bin/hadoop")
 Sys.setenv("HADOOP_HOME" = "/usr/local/hadoop")
 Sys.setenv("HADOOP_STREAMING" = "/usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.6.0.jar")
-Sys.setenv("HIVE_HOME" = "/usr/local/hadoop/hive-1.2.0")
-Sys.setenv("RHIVE_FS_HOME" = "/home/hadoop/rhive")
 
 library(rhdfs)
 library(rmr2)
@@ -13,17 +11,28 @@ library(quantmod)
 
 hdfs.init()
 
-chartData = from.dfs("/ML_OHLC_CLUSTER")
+chartData = from.dfs("/ML_OHLC_STREAMING", format = make.input.format("csv", sep = "\t"))$val
+names(chartData) = c("stock", "ohlc")
 
 # Define server logic required to summarize and view the selected dataset
 shinyServer(function(input, output) {
   
   # Return the chart dataset
   chartXTS <- reactive({
-    seriesData = chartData$val[chartData$key == input$stockID,]
-    names(seriesData) = c("date", "stock", "open", "high", "low", "close")
-    seriesData$date = as.Date(seriesData$date)
-    xts(seriesData[, 3:6], order.by = seriesData$date)
+    tmp = chartData[chartData$stock == input$stockID,]$ohlc
+    tmp = as.character(tmp)
+    
+    tmp = unlist(strsplit(tmp, "\\|"))
+    df = as.data.frame(do.call(rbind, strsplit(tmp, ",")))
+    
+    names(df) = c("date", "open", "high", "low", "close")
+    df$date = as.Date(as.character(df$date))
+    df$open = as.numeric(as.character(df$open))
+    df$high = as.numeric(as.character(df$high))
+    df$low = as.numeric(as.character(df$low))
+    df$close = as.numeric(as.character(df$close))
+    
+    xts(df[, 2:5], order.by = df$date)
   })
   
   # Return the returns dataset
