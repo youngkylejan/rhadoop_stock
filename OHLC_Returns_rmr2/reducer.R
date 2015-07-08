@@ -9,6 +9,7 @@ library(quantmod)
 
 returns_reducer <- function(k, v) {
   v = as.character(v)
+  v = unlist(strsplit(v, "\\|"))
   df = as.data.frame(do.call(rbind, strsplit(v, ",")))
   names(df) = c("date", "open", "high", "low", "close")
   df$date = as.Date(as.character(df$date))

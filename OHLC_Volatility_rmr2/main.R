@@ -5,8 +5,8 @@ Sys.setenv("HADOOP_STREAMING" = "/usr/local/hadoop/share/hadoop/tools/lib/hadoop
 library(rhdfs)
 library(rmr2)
 
-source('~/Documents/Cherry/OHLC_Returns_rmr2/mapper.R')
-source('~/Documents/Cherry/OHLC_Returns_rmr2/reducer.R')
+source('~/Documents/Cherry/OHLC_Volatility_rmr2/mapper.R')
+source('~/Documents/Cherry/OHLC_Volatility_rmr2/reducer.R')
 
 hdfs.init()
 
@@ -18,7 +18,8 @@ data.mr = mapreduce(
   input = data,
   map = returns_mapper,
   reduce = returns_reducer,
-  combine = TRUE
+  combine = TRUE,
+  output = "/ML_VOLATILITY"
 )
 
 y = from.dfs(data.mr)
