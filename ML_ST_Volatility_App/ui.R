@@ -25,7 +25,12 @@ shinyUI(fluidPage(
                   choices = stockIDs),
       dateRangeInput("dateRange", label = h3("Date Range"),
                      start = "2005-01-01",
-                     end = "2015-06-30")
+                     end = "2015-06-30"),
+      selectInput("volType", label = h3("Choose Volatility Type"),
+                  c("close_to_close_vol" = "close_to_close_vol",
+                    "garman_klass_vol" = "garman_klass_vol",
+                    "rogers_satchell_vol" = "rogers_satchell_vol",
+                    "yang_zhang_vol" = "yang_zhang_vol"))
     ),
     
     # Show a summary of the dataset and an HTML table with the requested
