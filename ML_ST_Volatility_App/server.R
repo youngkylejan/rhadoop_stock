@@ -31,8 +31,8 @@ shinyServer(function(input, output) {
 
   # Show the volatilities
   output$chart <- renderPlot({
-    tmp = subset(returnsData(), date > input$dateRange[1] && date < input$dateRange[2])
+    tmp = subset(returnsData(), date >= as.Date(input$dateRange[1]) & date <= as.Date(input$dateRange[2]))
     tmp$volatility = as.double(as.character(tmp$volatility))
-    qplot(date, volatility, data = tmp, na.rm = TRUE) + ylim(0, 1.5)
+    qplot(date, volatility, data = tmp, na.rm = TRUE) + ylim(0, 1.5) 
   })
 })
